@@ -11,6 +11,7 @@ npm-debug.log*
 
 # Database
 database.sqlite
+logs.sqlite
 
 # OS junk
 .DS_Store

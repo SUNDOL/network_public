@@ -4,7 +4,7 @@
 ## Tech Stack
 - **Node.js**: v22.14.0 or higher
 - **Frontend**: Vite + React (JavaScript + SWC)
-- **Backend**: Express.js
+- **Backend**: Fastify
 - **Database**: SQLite3
 
 ## Prerequisites
