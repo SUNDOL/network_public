@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# Database
+database.sqlite
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Runtime
+dist/
+build/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Optional - Fastify specific build files (if any)
+*.tsbuildinfo
