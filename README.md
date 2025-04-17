@@ -20,7 +20,7 @@ npm -v # 10.9.2 or higher
 1️⃣ Clone this repository:
 ```sh
 git clone https://github.com/SUNDOL/network_public
-cd network
+cd network_public
 ```
 
 2️⃣ Run the backend server:
