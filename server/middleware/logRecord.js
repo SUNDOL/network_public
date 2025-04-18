@@ -1,68 +1,46 @@
-const ControllerLog = require("../models/logRecords/ControllerLog");
-const ServiceLog = require("../models/logRecords/ServiceLog");
-const DatabaseLog = require("../models/logRecords/DatabaseLog");
+const ControllerLog = require("../models/logRecords/Log_C");
+const ServiceLog = require("../models/logRecords/Log_D");
+const DatabaseLog = require("../models/logRecords/Log_S");
+const os = require("os");
 
-const controllerLog = async ({ level, message, req, res, userId = null }) => {
+const createLog = async ({
+  model,
+  datasetPrefix,
+  level,
+  message,
+  req,
+  res,
+  userEmail = null,
+  userUuid = null,
+}) => {
   try {
-    await ControllerLog.create({
+    await model.create({
       "@timestamp": new Date().toISOString(),
       "log.level": level,
       message,
-      "event.dataset": "network_api.controller." + (req?.routeOptions?.url || "unknown"),
+      "event.dataset": `network_api.${datasetPrefix}.${req?.routeOptions?.url || "unknown"}`,
       "service.name": "network_api",
       "process.pid": process.pid,
-      "host.name": require("os").hostname(),
+      "host.name": os.hostname(),
       "http.request.method": req?.method,
       "http.response.status_code": res?.statusCode,
       "url.path": req?.url,
-      "user.id": userId?.toString() || null,
+      "user.email": userEmail || null,
+      "user.uuid": userUuid || null,
       "trace.id": req?.id || null
     });
   } catch (err) {
-    console.error("Controller logging failed", err);
+    console.error(`${datasetPrefix} logging failed`, err);
   }
 };
 
-const serviceLog = async ({ level, message, req, res, userId = null }) => {
-  try {
-    await ServiceLog.create({
-      "@timestamp": new Date().toISOString(),
-      "log.level": level,
-      message,
-      "event.dataset": "network_api.service." + (req?.routeOptions?.url || "unknown"),
-      "service.name": "network_api",
-      "process.pid": process.pid,
-      "host.name": require("os").hostname(),
-      "http.request.method": req?.method,
-      "http.response.status_code": res?.statusCode,
-      "url.path": req?.url,
-      "user.id": userId?.toString() || null,
-      "trace.id": req?.id || null
-    });
-  } catch (err) {
-    console.error("Service logging failed", err);
-  }
-};
+const cLog = (params) =>
+  createLog({ ...params, model: ControllerLog, datasetPrefix: "controller" });
 
-const databaseLog = async ({ level, message, req, res, userId = null }) => {
-  try {
-    await DatabaseLog.create({
-      "@timestamp": new Date().toISOString(),
-      "log.level": level,
-      message,
-      "event.dataset": "network_api.database." + (req?.routeOptions?.url || "unknown"),
-      "service.name": "network_api",
-      "process.pid": process.pid,
-      "host.name": require("os").hostname(),
-      "http.request.method": req?.method,
-      "http.response.status_code": res?.statusCode,
-      "url.path": req?.url,
-      "user.id": userId?.toString() || null,
-      "trace.id": req?.id || null
-    });
-  } catch (err) {
-    console.error("Database logging failed", err);
-  }
-};
+const sLog = (params) =>
+  createLog({ ...params, model: ServiceLog, datasetPrefix: "service" });
 
-module.exports = { controllerLog, serviceLog, databaseLog };
+const dLog = (params) =>
+  createLog({ ...params, model: DatabaseLog, datasetPrefix: "database" });
+
+module.exports = { cLog, sLog, dLog };

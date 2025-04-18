@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
@@ -36,7 +37,10 @@ const User = sequelize.define('User', {
             user.uPassword = await bcrypt.hash(user.uPassword, 10);
         },
         beforeUpdate: async (user) => {
-            if (user.changed("uPassword") && user.uPassword) {
+            if (user.changed("uPassword")) {
+                if (!user.uPassword || user.uPassword.trim() === "") {
+                    throw new Error("Password cannot be empty");
+                };
                 if (user.uPassword !== user._previousDataValues.uPassword) {
                     const salt = await bcrypt.genSalt(10);
                     user.uPassword = await bcrypt.hash(user.uPassword, salt);
